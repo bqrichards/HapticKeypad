@@ -1,8 +1,11 @@
+#import <AudioToolbox/AudioServices.h>
+
 @interface TUCallProviderManager
 @end
 
 @interface DialerController
 -(void)bootHapticFeedback;
+-(void)fireHaptic;
 -(void)viewWillAppear:(bool)arg1;
 -(void)viewWillDisappear:(bool)arg1;
 -(void)phonePad:(UIView*)pad keyDown:(char)key;
@@ -19,7 +22,27 @@ UIImpactFeedbackGenerator *impact;
 	// Allocate impact generator
 	if (impact == nil) {
 		impact = [[UIImpactFeedbackGenerator alloc] init];
-		[impact prepare];
+	}
+
+	[impact prepare];
+}
+
+%new
+-(void)fireHaptic {
+	[self bootHapticFeedback];
+	
+	int feedbackSupportLevel = [[[UIDevice currentDevice] valueForKey:@"_feedbackSupportLevel"] integerValue];
+
+	if (feedbackSupportLevel == 0) {
+		%log(@"Haptic and Taptic not supported");
+		return;
+	} else if (feedbackSupportLevel == 1) {
+		// iPhone 6s/6s+, Taptic Engine
+		SystemSoundID peek = SystemSoundID(1519);
+		AudioServicesPlaySystemSound(peek);
+	} else if (feedbackSupportLevel == 2) {
+		// iPhone 7+, Haptic Feedback
+		[impact impactOccurred];
 	}
 }
 
@@ -36,30 +59,18 @@ UIImpactFeedbackGenerator *impact;
 }
 
 -(void)phonePadDeleteLastDigit:(int)digit {
-	[self bootHapticFeedback];
-
-	[impact impactOccurred];
-	[impact prepare];
-
 	%orig;
+	[self fireHaptic];
 }
 
 -(void)phonePad:(UIView *)pad keyDown:(char)key {
-	[self bootHapticFeedback];
-
-	[impact impactOccurred];
-	[impact prepare];
-
 	%orig;
+	[self fireHaptic];
 }
 
 -(void)_callButtonPressedActionWithCallProvider:(TUCallProviderManager *)provider {
-	[self bootHapticFeedback];
-
-	[impact impactOccurred];
-	[impact prepare];
-
 	%orig;
+	[self fireHaptic];
 }
 
 %end
