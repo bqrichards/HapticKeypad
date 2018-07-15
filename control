@@ -1,0 +1,11 @@
+Package: net.bqrichards.haptickeypad
+Name: HapticKeypad
+Depends: mobilesubstrate
+Version: 1.0.0
+Architecture: iphoneos-arm
+Description: Haptic Feedback in the Phone app
+ Tested on iPhone X with 11.3.1
+ Supply haptic feedback when entering digits, deleting digits or calling in the Phone app.
+Maintainer: Brandon Richards <bqrichards@icloud.com>
+Author: Brandon Richards <bqrichards@icloud.com>
+Section: Tweaks
